@@ -116,7 +116,3 @@ def executar_job():
         print("Nenhuma solicitação 'SOLICITADA' para processar.")
 
     print("Job concluído.")
-
-
-
-executar_job()

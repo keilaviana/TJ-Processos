@@ -1,10 +1,11 @@
+import json
 import scrapy
 
 class TJCEScrapper(scrapy.Spider):
-    name = 'tjcecrapper'
+    name = 'tjalcrapper'
 
     def __init__(self, numero_processo='', **kwargs):
-        self.start_urls = [f'https://esaj.tjce.jus.br/cpopg/show.do?processo.numero={numero_processo}']
+        self.start_urls = [f'https://www2.tjal.jus.br/cpopg/show.do?processo.numero={numero_processo}']
         super().__init__(**kwargs)
         
     def parse(self, response):
@@ -53,3 +54,4 @@ class TJCEScrapper(scrapy.Spider):
             'partes_do_processo' :participantes,
             'lista_das_movimentacoes' :movimentacoes,
         }
+

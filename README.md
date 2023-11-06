@@ -20,7 +20,7 @@ A API permite o cadastro e a busca dos dados de um processo em todos os graus do
 3. Configure a conexão com o banco de dados em `app\__init__.py`
 
 ## Uso
-1. Execute o script: : `python create_db.py`, para criação do banco *db_solicitacoes* e da tabela *solicitacoes*;
+1. Execute o script: : `python create_db.py`, para criação do schema *db_solicitacoes* e da tabela *solicitacoes*;
 2. Execute o Schedule: `python app.py`, ele que irá orquestrar a execução o aplicativo Flask e a solicitação do JOB;
     - Aplicativo Flask: O aplicativo Flask fornece duas rotas para interagir com solicitações de processos judiciais. Uma rota é responsável por cadastrar novos números de processo, enquanto a outra rota lê informações dos processos cadastrados.
     - JOB: É um script Python (`processamento.py`) que executa um job e processa solicitações judiciais pendentes. Ele interage com um banco de dados, consulta solicitações marcadas como 'SOLICITADA' e executa web scraping com base no número do processo e no estado a que pertence. Os resultados são armazenados no banco de dados.

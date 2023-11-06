@@ -28,8 +28,11 @@ def ler_processo(numero):
 
     if processo.status_solicitacao == "SOLICITADA":
         return jsonify({'message': f'A consulta do número do processo: {processo.id_solicitacao}, ainda está fila. Tente novamente em alguns instantes.'})
+    if processo.status_solicitacao == "EM ANDAMENTO":
+        return jsonify({'message': f'A consulta do número do processo: {processo.id_solicitacao}, está em andamento. Tente novamente em alguns instantes.'})
     dados_do_processo = {
         'id_solicitacao': processo.id_solicitacao,
+        'status': processo.status_solicitacao,
         'result': processo.json_resposta,
     }
     return jsonify(dados_do_processo)

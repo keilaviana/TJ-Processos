@@ -33,8 +33,32 @@ Rotas da API:
 | `GET` | `/ler-processo/<numero>`| Retorna informações da solicitação. |
 | `POST` | `/cadastrar-numero-processo` | Utilizado para criar uma nova solicitação. |
 
-## Estrutura do Projeto
+#### Dados para envio no POST
+| Parâmetro | Descrição |
+|---|---|
+| `numero_processo` | '0070337-91.2008.8.06.0001' |
 
++ Formato <numero_processo>
+    + NNNNNNN-DD.AAAA.J.TR.OOOO
+    + | Campo | Algarismos | Descrição |
+      |---|---|---|
+      | `NNNNNNN` | 7 | Identifica o numero sequencial dado pela vara ou juizo de origem. Deve ser reiniciado a cada ano |
+      | `DD` | 2 | É o digito verificador que autentica a validade da numeração |
+      | `AAAA` | 4 | Identifica o ano de início do processo |
+      | `J` | 1 | Identifica o ramo da justiça |
+      | `TR` | 2 | Identifica o tribunal |  
+      | `OOOO` | 4 | Identifica a vara originária do processo |
+      
+
++ Request (application/json)
+
+    + Body
+        {
+            "numero_processo": "0070337-91.2008.8.06.0001"
+        }
+
+
+## Estrutura do Projeto
 
 ```dir
 app/

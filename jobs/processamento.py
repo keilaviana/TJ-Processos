@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import subprocess
 import sys
 from sqlalchemy.orm import sessionmaker
@@ -63,19 +64,20 @@ def executa_scrapy(estado, numero_processo, grau):
         print("Erro ao executar crawler", e)
 
 def identificar_estado(numero_processo):
-    partes = numero_processo.split('.')
 
-    if len(partes) >= 4:
-        codigo_tribunal = partes[3] 
+    regex_num_processo = r'^\d{7}-\d{2}\.\d{4}\.\d{1}\.\d{2}\.\d{4}$'
+
+    if re.match(regex_num_processo, numero_processo):
+        codigo_tribunal = numero_processo.split('.')[3] 
 
         if codigo_tribunal == '06':
             return "ce"
-        elif codigo_tribunal == '02':
+        if codigo_tribunal == '02':
             return "al"
-        else:
-            return "Tribunal não identificado"
-    else:
-        return "Formato de número de processo inválido"
+        
+        raise ValueError('Tribunal não identificado')
+        
+    raise ValueError('Formato de número de processo inválido')
 
 
 
@@ -85,21 +87,24 @@ def processar_solucitacao(numero_processo, solicitacao):
         if solicitacao:
             solicitacao.status_solicitacao = "EM ANDAMENTO"
             db.session.commit()
-    estado = identificar_estado(numero_processo)
-    resultados = {}
+        try:
+            estado = identificar_estado(numero_processo)
+            resultados = {}
+            resultados.update({'grau_1': executa_scrapy(estado, numero_processo, 1)})
+            resultados.update({'grau_2': executa_scrapy(estado, numero_processo, 2)})
 
-    result = executa_scrapy(estado, numero_processo, 1)
-    resultados.update({'grau_1': result})
-    result = executa_scrapy(estado, numero_processo, 2)
-    resultados.update({'grau_2': result})
-
-    with app.app_context():
-        solicitacao = Solicitacoes.query.filter_by(id_solicitacao=numero_processo).first()
-        if solicitacao:
-            solicitacao.json_resposta = resultados
-            solicitacao.status_solicitacao = "FINALIZADA"
+            with app.app_context():
+                solicitacao = Solicitacoes.query.filter_by(id_solicitacao=numero_processo).first()
+                if solicitacao:
+                    solicitacao.json_resposta = resultados
+                    solicitacao.status_solicitacao = "FINALIZADA"
+                    db.session.commit()
+        except Exception as error:
+            solicitacao.status_solicitacao = "ERRO"
+            solicitacao.json_resposta = {'erro': str(error)}
             db.session.commit()
-    pass
+            print(error)
+
 
 def executar_job():
     print("Iniciando o job...")
@@ -113,6 +118,6 @@ def executar_job():
             print(f"Processando solicitação para o processo {numero_processo}...")
             resultado_crawler = processar_solucitacao(numero_processo, solicitacao)
     else:
-        print("Nenhuma solicitação 'SOLICITADA' para processar.")
+        print("Nenhuma solicitação com o status 'SOLICITADA' para processar.")
 
     print("Job concluído.")
